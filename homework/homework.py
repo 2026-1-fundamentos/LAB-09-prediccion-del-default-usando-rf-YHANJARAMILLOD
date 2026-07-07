@@ -59,7 +59,7 @@ ruta_completa = os.path.join(ruta_carpeta, nombre_archivo)
 if not os.path.exists(ruta_carpeta):
     os.makedirs(ruta_carpeta)
 with gzip.open(ruta_completa, 'wb') as f:
-    pickle.dump(mejor_modelo, f, protocol=4)
+    pickle.dump(optimizador, f, protocol=4)
 
 y_train_pred = mejor_modelo.predict(X_train)
 y_test_pred = mejor_modelo.predict(X_test)
