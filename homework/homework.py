@@ -2,7 +2,8 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
-import joblib
+import pickle
+import gzip
 import os
 import json
 from sklearn.metrics import precision_score, balanced_accuracy_score, recall_score, f1_score
@@ -54,10 +55,11 @@ ruta_carpeta = 'files/models'
 nombre_archivo = 'model.pkl.gz'
 ruta_completa = os.path.join(ruta_carpeta, nombre_archivo)
 
-# 2. Si la carpeta no existe, Python la crea automáticamente
+# 2. Si     la carpeta no existe, Python la crea automáticamente
 if not os.path.exists(ruta_carpeta):
     os.makedirs(ruta_carpeta)
-joblib.dump(mejor_modelo, ruta_completa, compress=('gzip', 3))
+with gzip.open(ruta_completa, 'wb') as f:
+    pickle.dump(mejor_modelo, f)
 
 y_train_pred = mejor_modelo.predict(X_train)
 y_test_pred = mejor_modelo.predict(X_test)
