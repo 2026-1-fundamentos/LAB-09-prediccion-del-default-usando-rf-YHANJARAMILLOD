@@ -1,3 +1,126 @@
+import pandas as pd
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+import joblib
+import os
+import json
+from sklearn.metrics import precision_score, balanced_accuracy_score, recall_score, f1_score
+from sklearn.metrics import confusion_matrix
+dftest = pd.read_csv('files/input/test_data.csv.zip', compression='zip')
+dftrain = pd.read_csv('files/input/train_data.csv.zip', compression='zip')
+dftest.rename(columns={'default payment next month': 'default'}, inplace=True)
+dftrain.rename(columns={'default payment next month': 'default'}, inplace=True)
+dftest.drop(columns=['ID'], inplace=True)
+dftrain.drop(columns=['ID'], inplace=True)
+
+dftrain = dftrain[dftrain['EDUCATION'] != 0]
+dftest = dftest[dftest['EDUCATION'] != 0]
+dftrain = dftrain[dftrain['MARRIAGE'] != 0]
+dftest = dftest[dftest['MARRIAGE'] != 0]
+dftrain['EDUCATION'] = dftrain['EDUCATION'].apply(lambda x: 4 if x > 4 else x)
+dftest['EDUCATION'] = dftest['EDUCATION'].apply(lambda x: 4 if x > 4 else x)
+
+X_train = dftrain.drop(columns=['default']) 
+y_train = dftrain['default'] 
+
+X_test = dftest.drop(columns=['default']) 
+y_test = dftest['default']
+
+# El pipeline ahora solo tiene un paso
+pipeline_modelo = Pipeline(
+    steps=[
+        ('clasificador', RandomForestClassifier())
+    ]
+)
+parametros_a_probar = {
+    'clasificador__n_estimators': [50, 100, 200],  # Cantidad de árboles en el bosque
+    'clasificador__max_depth': [None, 10, 20]      # Profundidad máxima de cada árbol
+}
+
+# 2. Configuramos la Validación Cruzada y la Métrica
+optimizador = GridSearchCV(
+    estimator=pipeline_modelo,            # Tu pipeline creado en el paso anterior
+    param_grid=parametros_a_probar,       # Las combinaciones a probar
+    cv=10,                                # Los 10 splits (Validación cruzada)
+    scoring='balanced_accuracy',          # La métrica: Precisión balanceada
+    n_jobs=-1                             # Usa todos los núcleos de tu PC para que sea más rápido
+)
+
+optimizador.fit(X_train, y_train)
+mejor_modelo = optimizador.best_estimator_
+
+ruta_carpeta = 'files/models'
+nombre_archivo = 'model.pkl.gz'
+ruta_completa = os.path.join(ruta_carpeta, nombre_archivo)
+
+# 2. Si la carpeta no existe, Python la crea automáticamente
+if not os.path.exists(ruta_carpeta):
+    os.makedirs(ruta_carpeta)
+joblib.dump(mejor_modelo, ruta_completa, compress=('gzip', 3))
+
+y_train_pred = mejor_modelo.predict(X_train)
+y_test_pred = mejor_modelo.predict(X_test)
+metrics_train = {
+    'dataset': 'train',
+    'precision': round(precision_score(y_train, y_train_pred), 4),
+    'balanced_accuracy': round(balanced_accuracy_score(y_train, y_train_pred), 4),
+    'recall': round(recall_score(y_train, y_train_pred), 4),
+    'f1_score': round(f1_score(y_train, y_train_pred), 4)
+}
+metrics_test = {
+    'dataset': 'test',
+    'precision': round(precision_score(y_test, y_test_pred), 4),
+    'balanced_accuracy': round(balanced_accuracy_score(y_test, y_test_pred), 4),
+    'recall': round(recall_score(y_test, y_test_pred), 4),
+    'f1_score': round(f1_score(y_test, y_test_pred), 4)
+}
+
+ruta_archivo = 'files/output/metrics.json'
+
+with open(ruta_archivo, 'w', encoding='utf-8') as archivo:
+    # Escribimos el diccionario de train y un salto de línea (\n)
+    archivo.write(json.dumps(metrics_train) + '\n')
+    # Escribimos el diccionario de test y un salto de línea (\n)
+    archivo.write(json.dumps(metrics_test) + '\n')
+
+cm_train = confusion_matrix(y_train, y_train_pred)
+cm_test = confusion_matrix(y_test, y_test_pred)
+dict_cm_train = {
+    'type': 'cm_matrix',
+    'dataset': 'train',
+    'true_0': {"predicted_0": int(cm_train[0][0]), "predicted_1": int(cm_train[0][1])},
+    'true_1': {"predicted_0": int(cm_train[1][0]), "predicted_1": int(cm_train[1][1])}
+}
+
+dict_cm_test = {
+    'type': 'cm_matrix',
+    'dataset': 'test',
+    'true_0': {"predicted_0": int(cm_test[0][0]), "predicted_1": int(cm_test[0][1])},
+    'true_1': {"predicted_0": int(cm_test[1][0]), "predicted_1": int(cm_test[1][1])}
+}
+
+ruta_archivo = 'files/output/metrics.json'
+
+with open(ruta_archivo, 'a', encoding='utf-8') as archivo:
+    archivo.write(json.dumps(dict_cm_train) + '\n')
+    archivo.write(json.dumps(dict_cm_test) + '\n')
+
+
+
+
+
+
+# 4. Ver los resultados
+'''print("Los mejores hiperparámetros encontrados son:")
+print(optimizador.best_params_)
+print("\nLa mejor precisión balanceada obtenida fue:")
+print(optimizador.best_score_)'''
+
+
+
+
+
 # flake8: noqa: E501
 #
 # En este dataset se desea pronosticar el default (pago) del cliente el próximo
