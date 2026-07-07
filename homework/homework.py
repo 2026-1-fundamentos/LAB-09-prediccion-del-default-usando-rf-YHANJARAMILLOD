@@ -45,7 +45,7 @@ optimizador = GridSearchCV(
     param_grid=parametros_a_probar,       # Las combinaciones a probar
     cv=10,                                # Los 10 splits (Validación cruzada)
     scoring='balanced_accuracy',          # La métrica: Precisión balanceada
-    n_jobs=-1                             # Usa todos los núcleos de tu PC para que sea más rápido
+    n_jobs=1                             # Usa todos los núcleos de tu PC para que sea más rápido
 )
 
 optimizador.fit(X_train, y_train)
@@ -59,7 +59,7 @@ ruta_completa = os.path.join(ruta_carpeta, nombre_archivo)
 if not os.path.exists(ruta_carpeta):
     os.makedirs(ruta_carpeta)
 with gzip.open(ruta_completa, 'wb') as f:
-    pickle.dump(mejor_modelo, f)
+    pickle.dump(mejor_modelo, f, protocol=4)
 
 y_train_pred = mejor_modelo.predict(X_train)
 y_test_pred = mejor_modelo.predict(X_test)
