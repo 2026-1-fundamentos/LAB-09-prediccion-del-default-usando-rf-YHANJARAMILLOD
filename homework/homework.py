@@ -41,25 +41,35 @@ parametros_a_probar = {
 
 # 2. Configuramos la Validación Cruzada y la Métrica
 optimizador = GridSearchCV(
-    estimator=pipeline_modelo,            # Tu pipeline creado en el paso anterior
-    param_grid=parametros_a_probar,       # Las combinaciones a probar
-    cv=10,                                # Los 10 splits (Validación cruzada)
-    scoring='balanced_accuracy',          # La métrica: Precisión balanceada
-    n_jobs=1                             # Usa todos los núcleos de tu PC para que sea más rápido
+    estimator=pipeline_modelo,            
+    param_grid=parametros_a_probar,       
+    cv=10,                                
+    scoring='balanced_accuracy',          
+    n_jobs=3,
+    verbose=3                            
 )
 
+print("⏳ Pasando paso 1: Iniciando el entrenamiento pesado (GridSearchCV)...")
+print("Nota: Al usar n_jobs=1 esto puede tardar unos minutos. No cierres la terminal.")
+
 optimizador.fit(X_train, y_train)
+
+print("✅ ¡Paso 2 completado! El entrenamiento terminó con éxito.")
+
 mejor_modelo = optimizador.best_estimator_
 
 ruta_carpeta = 'files/models'
 nombre_archivo = 'model.pkl.gz'
 ruta_completa = os.path.join(ruta_carpeta, nombre_archivo)
 
-# 2. Si     la carpeta no existe, Python la crea automáticamente
-if not os.path.exists(ruta_carpeta):
-    os.makedirs(ruta_carpeta)
+print(f"📂 Paso 3: Verificando/Creando la carpeta en '{ruta_carpeta}'...")
+os.makedirs(ruta_carpeta, exist_ok=True) # Esto hace lo mismo que tu IF pero en una sola línea limpia
+
+print("💾 Paso 4: Escribiendo el archivo model.pkl.gz en el disco...")
 with gzip.open(ruta_completa, 'wb') as f:
     pickle.dump(optimizador, f, protocol=4)
+
+print("🎉 ¡PROCESO TERMINADO! El modelo se guardó y creó correctamente.")
 
 y_train_pred = mejor_modelo.predict(X_train)
 y_test_pred = mejor_modelo.predict(X_test)
