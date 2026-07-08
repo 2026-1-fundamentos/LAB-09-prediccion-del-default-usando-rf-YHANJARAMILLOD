@@ -90,6 +90,7 @@ print("🎉 ¡PROCESO TERMINADO! El modelo se guardó y creó correctamente.")
 y_train_pred = mejor_modelo.predict(X_train)
 y_test_pred = mejor_modelo.predict(X_test)
 metrics_train = {
+    'type': 'metrics',
     'dataset': 'train',
     'precision': round(precision_score(y_train, y_train_pred), 4),
     'balanced_accuracy': round(balanced_accuracy_score(y_train, y_train_pred), 4),
@@ -97,6 +98,7 @@ metrics_train = {
     'f1_score': round(f1_score(y_train, y_train_pred), 4)
 }
 metrics_test = {
+    'type': 'metrics',
     'dataset': 'test',
     'precision': round(precision_score(y_test, y_test_pred), 4),
     'balanced_accuracy': round(balanced_accuracy_score(y_test, y_test_pred), 4),
