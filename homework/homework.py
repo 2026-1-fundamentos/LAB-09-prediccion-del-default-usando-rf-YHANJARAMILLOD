@@ -40,11 +40,10 @@ preprocesador = ColumnTransformer(
     remainder='passthrough' # ¡Muy importante! Le dice que deje las columnas numéricas intactas
 )
 # El pipeline ahora solo tiene un paso
-pipeline_modelo = Pipeline(
-    steps=[('preprocesamiento', preprocesador), 
-        ('clasificador', RandomForestClassifier())
-    ]
-)
+pipeline_modelo = Pipeline(steps=[
+    ('preprocesamiento', preprocesador),
+    ('clasificador', RandomForestClassifier(random_state=42, class_weight='balanced')) 
+])
 parametros_a_probar = {
     'clasificador__n_estimators': [50, 100, 200],  # Cantidad de árboles en el bosque
     'clasificador__max_depth': [None, 10, 20]      # Profundidad máxima de cada árbol
