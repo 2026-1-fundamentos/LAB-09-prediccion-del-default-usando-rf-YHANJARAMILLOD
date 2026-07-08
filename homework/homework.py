@@ -45,10 +45,14 @@ pipeline_modelo = Pipeline(steps=[
     ('clasificador', RandomForestClassifier(random_state=42, class_weight='balanced')) 
 ])
 parametros_a_probar = {
-    'clasificador__n_estimators': [100, 200],
-    # 'None' permite que el árbol crezca todo lo que necesite para aprender bien los datos de entrenamiento
-    'clasificador__max_depth': [None, 10, 20], 
-    'clasificador__min_samples_split': [2, 5]
+    # 200 a 300 árboles le da mucha más estabilidad y precisión
+    'clasificador__n_estimators': [200, 300], 
+    
+    # 15 o 20 es el "punto dulce" donde aprende bien sin memorizar a ciegas
+    'clasificador__max_depth': [15, 20, 25], 
+    
+    # Exigimos que las hojas finales tengan al menos 2 ejemplos (mejora la generalización)
+    'clasificador__min_samples_leaf': [1, 2]
 }
 
 # 2. Configuramos la Validación Cruzada y la Métrica
@@ -57,7 +61,7 @@ optimizador = GridSearchCV(
     param_grid=parametros_a_probar,       
     cv=10,                                
     scoring='balanced_accuracy',          
-    n_jobs=3,
+    n_jobs=4,
     verbose=3                            
 )
 
