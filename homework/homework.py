@@ -45,8 +45,10 @@ pipeline_modelo = Pipeline(steps=[
     ('clasificador', RandomForestClassifier(random_state=42, class_weight='balanced')) 
 ])
 parametros_a_probar = {
-    'clasificador__n_estimators': [50, 100, 200],  # Cantidad de árboles en el bosque
-    'clasificador__max_depth': [None, 10, 20]      # Profundidad máxima de cada árbol
+    'clasificador__n_estimators': [100, 200],
+    # 'None' permite que el árbol crezca todo lo que necesite para aprender bien los datos de entrenamiento
+    'clasificador__max_depth': [None, 10, 20], 
+    'clasificador__min_samples_split': [2, 5]
 }
 
 # 2. Configuramos la Validación Cruzada y la Métrica
