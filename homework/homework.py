@@ -1,4 +1,6 @@
 import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
@@ -28,9 +30,18 @@ y_train = dftrain['default']
 X_test = dftest.drop(columns=['default']) 
 y_test = dftest['default']
 
+columnas_categoricas = ['SEX', 'EDUCATION', 'MARRIAGE']
+
+
+preprocesador = ColumnTransformer(
+    transformers=[
+        ('cat', OneHotEncoder(handle_unknown='ignore'), columnas_categoricas)
+    ],
+    remainder='passthrough' # ¡Muy importante! Le dice que deje las columnas numéricas intactas
+)
 # El pipeline ahora solo tiene un paso
 pipeline_modelo = Pipeline(
-    steps=[
+    steps=[('preprocesamiento', preprocesador), 
         ('clasificador', RandomForestClassifier())
     ]
 )
