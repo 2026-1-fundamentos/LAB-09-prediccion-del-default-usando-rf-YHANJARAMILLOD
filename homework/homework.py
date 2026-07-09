@@ -45,13 +45,11 @@ pipeline_modelo = Pipeline(steps=[
     ('clasificador', RandomForestClassifier(random_state=42,class_weight='balanced')) 
 ])
 parametros_a_probar = {
-    'clasificador__n_estimators': [100, 200, 300],
-    'clasificador__max_depth': [None, 10, 20],
-    'clasificador__min_samples_split': [2, 5],
-    'clasificador__min_samples_leaf': [1, 2, 4],
-    'clasificador__criterion': ['gini', 'entropy'],
-    # ESTO ES NUEVO: Obliga a los árboles a ser más creativos y reduce el overfitting
-    'clasificador__max_features': ['sqrt', 'log2'] 
+    'clasificador__n_estimators': [300,500],
+    'clasificador__max_depth': [None],
+    'clasificador__min_samples_split': [2,5],
+    'clasificador__min_samples_leaf': [2],
+
 }
 # 2. Configuramos la Validación Cruzada y la Métrica
 optimizador = GridSearchCV(
@@ -59,8 +57,9 @@ optimizador = GridSearchCV(
     param_grid=parametros_a_probar,       
     cv=10,                                
     scoring='balanced_accuracy',          
-    n_jobs=5,
-    verbose=3                            
+    n_jobs=7,
+    verbose=3,
+    refit=True,                          
 )
 
 print("⏳ Pasando paso 1: Iniciando el entrenamiento pesado (GridSearchCV)...")
