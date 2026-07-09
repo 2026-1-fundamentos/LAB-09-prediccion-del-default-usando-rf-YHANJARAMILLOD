@@ -45,17 +45,13 @@ pipeline_modelo = Pipeline(steps=[
     ('clasificador', RandomForestClassifier(random_state=42, class_weight='balanced')) 
 ])
 parametros_a_probar = {
-    # 200 árboles son suficientes para sacar un puntaje altísimo
-    'clasificador__n_estimators': [200], 
-    
-    # ¡EL SECRETO! 'None' permite que el modelo crezca sin límite y memorice el entrenamiento
-    'clasificador__max_depth': [None], 
-    
-    # Estos son los valores más permisivos posibles
-    'clasificador__min_samples_split': [2], 
-    'clasificador__min_samples_leaf': [1]
+    'clasificador__n_estimators': [200],
+    # 25 y 30 son el punto dulce para no memorizar tanto. None por si acaso lo necesita.
+    'clasificador__max_depth': [25, 30, None], 
+    # Obligamos a que las divisiones requieran un poquito más de evidencia
+    'clasificador__min_samples_split': [2, 5], 
+    'clasificador__min_samples_leaf': [1, 2]
 }
-
 # 2. Configuramos la Validación Cruzada y la Métrica
 optimizador = GridSearchCV(
     estimator=pipeline_modelo,            
