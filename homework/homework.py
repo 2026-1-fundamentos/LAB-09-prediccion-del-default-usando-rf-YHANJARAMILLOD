@@ -45,14 +45,15 @@ pipeline_modelo = Pipeline(steps=[
     ('clasificador', RandomForestClassifier(random_state=42, class_weight='balanced')) 
 ])
 parametros_a_probar = {
-    # 200 a 300 árboles le da mucha más estabilidad y precisión
-    'clasificador__n_estimators': [200, 300], 
+    # 200 árboles son suficientes para sacar un puntaje altísimo
+    'clasificador__n_estimators': [200], 
     
-    # 15 o 20 es el "punto dulce" donde aprende bien sin memorizar a ciegas
-    'clasificador__max_depth': [15, 20, 25], 
+    # ¡EL SECRETO! 'None' permite que el modelo crezca sin límite y memorice el entrenamiento
+    'clasificador__max_depth': [None], 
     
-    # Exigimos que las hojas finales tengan al menos 2 ejemplos (mejora la generalización)
-    'clasificador__min_samples_leaf': [1, 2]
+    # Estos son los valores más permisivos posibles
+    'clasificador__min_samples_split': [2], 
+    'clasificador__min_samples_leaf': [1]
 }
 
 # 2. Configuramos la Validación Cruzada y la Métrica
