@@ -42,14 +42,13 @@ preprocesador = ColumnTransformer(
 # El pipeline ahora solo tiene un paso
 pipeline_modelo = Pipeline(steps=[
     ('preprocesamiento', preprocesador),
-    ('clasificador', RandomForestClassifier(random_state=42,class_weight='balanced')) 
+    ('clasificador', RandomForestClassifier(random_state=42)) 
 ])
 parametros_a_probar = {
-    'clasificador__n_estimators': [300,500],
-    'clasificador__max_depth': [None],
-    'clasificador__min_samples_split': [2,5],
-    'clasificador__min_samples_leaf': [2],
-
+    "clasificador__n_estimators": [300, 500],
+    "clasificador__max_depth": [None],
+    "clasificador__min_samples_leaf": [2],
+    "clasificador__min_samples_split": [2, 5],
 }
 # 2. Configuramos la Validación Cruzada y la Métrica
 optimizador = GridSearchCV(
