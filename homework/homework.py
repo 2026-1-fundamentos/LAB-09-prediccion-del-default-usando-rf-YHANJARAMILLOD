@@ -42,7 +42,7 @@ preprocesador = ColumnTransformer(
 # El pipeline ahora solo tiene un paso
 pipeline_modelo = Pipeline(steps=[
     ('preprocesamiento', preprocesador),
-    ('clasificador', RandomForestClassifier(random_state=42, class_weight='balanced')) 
+    ('clasificador', RandomForestClassifier(random_state=42)) 
 ])
 parametros_a_probar = {
     'clasificador__n_estimators': [200],
@@ -58,7 +58,7 @@ optimizador = GridSearchCV(
     param_grid=parametros_a_probar,       
     cv=10,                                
     scoring='balanced_accuracy',          
-    n_jobs=4,
+    n_jobs=5,
     verbose=3                            
 )
 
