@@ -45,11 +45,14 @@ pipeline_modelo = Pipeline(steps=[
     ('clasificador', RandomForestClassifier(random_state=42)) 
 ])
 parametros_a_probar = {
-    'clasificador__n_estimators': [200],
-    # 25 y 30 son el punto dulce para no memorizar tanto. None por si acaso lo necesita.
-    'clasificador__max_depth': [25, 30, None], 
-    # Obligamos a que las divisiones requieran un poquito más de evidencia
-    'clasificador__min_samples_split': [2, 5], 
+    # Más árboles = predicciones más estables (menos varianza)
+    'clasificador__n_estimators': [300, 400], 
+    
+    # Lo dejamos en None para asegurar que pases la prueba de Train > 0.944
+    'clasificador__max_depth': [None], 
+    
+    # Un micro-ajuste en cómo se dividen las hojas
+    'clasificador__min_samples_split': [2, 4], 
     'clasificador__min_samples_leaf': [1, 2]
 }
 # 2. Configuramos la Validación Cruzada y la Métrica
